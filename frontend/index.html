@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="description" content="Sistema de achados e perdidos para registrar, buscar e devolver itens com mais rapidez.">
+    <meta name="theme-color" content="#0f766e">
+    <title>IF Localiza | Achados e Perdidos</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <script src="assets/js/script.js" defer></script>
+    <script type="module" src="/src/main.jsx"></script>
+</head>
+<body>
+    <a class="skip-link" href="#conteudo-principal">Ir para o conteúdo principal</a>
+
+    <header class="app-header" data-component="app-header">
+        <div class="container">
+            <a class="brand" href="#inicio" aria-label="IF Localiza, página inicial">
+                <span class="brand-mark" aria-hidden="true">IF</span>
+                <span class="brand-text">IF Localiza</span>
+            </a>
+
+            <nav class="primary-navigation" aria-label="Navegação principal">
+                <ul>
+                    <li><a href="#buscar">Buscar</a></li>
+                    <li><a href="#cadastrar">Cadastrar</a></li>
+                    <li><a href="#retirada">Retirada</a></li>
+                    <li><a href="#contato">Contato</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main id="conteudo-principal">
+        <section id="inicio" class="app-intro" aria-labelledby="titulo-principal">
+            <div class="container">
+                <p class="section-label">Sistema de achados e perdidos</p>
+                <h1 id="titulo-principal">Encontre ou registre itens perdidos com rapidez.</h1>
+                <p>
+                    Uma base preparada para receber API, banco de dados e componentes dinâmicos sem precisar refazer a estrutura depois.
+                </p>
+
+                <div class="intro-actions" aria-label="Ações principais">
+                    <a href="#buscar">Buscar item</a>
+                    <a href="#cadastrar">Cadastrar item</a>
+                </div>
+
+                <dl class="summary-grid" aria-label="Resumo do sistema" data-summary>
+                    <div>
+                        <dt>Itens ativos</dt>
+                        <dd data-counter="items-active">0</dd>
+                    </div>
+                    <div>
+                        <dt>Devolvidos</dt>
+                        <dd data-counter="items-returned">0</dd>
+                    </div>
+                    <div>
+                        <dt>Setores</dt>
+                        <dd data-counter="locations">0</dd>
+                    </div>
+                </dl>
+            </div>
+        </section>
+
+        <!-- seção de busca — React assume aqui -->
+        <section id="buscar" class="search-section">
+            <div class="container">
+                <div class="section-heading">
+                    <p class="section-label">Consulta</p>
+                    <h2>Buscar itens cadastrados</h2>
+                </div>
+        
+                <div id="root-busca"></div> <!-- ← React entra aqui -->
+        
+            </div>
+        </section>
+        
+        <!-- formulário de cadastro — outro root React -->
+        <section id="cadastrar" class="register-section">
+            <div class="container">
+                <div id="root-cadastro"></div> <!-- ← React entra aqui -->
+            </div>
+        </section>
+
+                <form class="item-form" method="post" enctype="multipart/form-data" data-form="item">
+                    <fieldset>
+                        <legend>Dados principais</legend>
+
+                        <label for="tipo-registro">Tipo de registro</label>
+                        <select id="tipo-registro" name="type" required>
+                            <option value="">Selecione</option>
+                            <option value="perdido">Item perdido</option>
+                            <option value="encontrado">Item encontrado</option>
+                        </select>
+
+                        <label for="nome-item">Nome do item</label>
+                        <input id="nome-item" name="name" type="text" placeholder="Ex.: carteira marrom" autocomplete="off" required>
+
+                        <label for="categoria-item">Categoria</label>
+                        <select id="categoria-item" name="category" required>
+                            <option value="">Selecione</option>
+                            <option value="documentos">Documentos</option>
+                            <option value="eletronicos">Eletrônicos</option>
+                            <option value="materiais">Materiais escolares</option>
+                            <option value="vestuario">Vestuário</option>
+                            <option value="outros">Outros</option>
+                        </select>
+
+                        <label for="descricao-item">Descrição</label>
+                        <textarea id="descricao-item" name="description" rows="5" placeholder="Informe cor, marca, detalhes e qualquer característica importante." required></textarea>
+                    </fieldset>
+
+                    <fieldset>
+                        <legend>Localização e contato</legend>
+
+                        <label for="local-item">Local relacionado</label>
+                        <input id="local-item" name="location" type="text" placeholder="Ex.: biblioteca, bloco A, laboratório" autocomplete="off" required>
+
+                        <label for="data-item">Data</label>
+                        <input id="data-item" name="date" type="date" required>
+
+                        <label for="responsavel-item">Responsável pelo registro</label>
+                        <input id="responsavel-item" name="contactName" type="text" autocomplete="name" required>
+
+                        <label for="contato-item">Contato</label>
+                        <input id="contato-item" name="contact" type="text" placeholder="E-mail, telefone ou matrícula" autocomplete="email" required>
+
+                        <label for="foto-item">Foto do item</label>
+                        <input id="foto-item" name="photo" type="file" accept="image/*">
+                    </fieldset>
+
+                    <button type="submit">Enviar registro</button>
+                </form>
+            </div>
+        </section>
+
+        <section id="retirada" class="pickup-section" aria-labelledby="titulo-retirada">
+            <div class="container">
+                <div class="section-heading">
+                    <p class="section-label">Retirada</p>
+                    <h2 id="titulo-retirada">Fluxo de devolução</h2>
+                </div>
+
+                <ol class="process-list">
+                    <li>Localize o item na busca.</li>
+                    <li>Confira a descrição e o setor responsável.</li>
+                    <li>Apresente identificação para confirmar a retirada.</li>
+                </ol>
+            </div>
+        </section>
+
+        <section id="contato" class="contact-section" aria-labelledby="titulo-contato">
+            <div class="container">
+                <div class="section-heading">
+                    <p class="section-label">Atendimento</p>
+                    <h2 id="titulo-contato">Canais de suporte</h2>
+                </div>
+
+                <address>
+                    <p><strong>Setor responsável:</strong> Coordenação de atendimento</p>
+                    <p><strong>E-mail:</strong> <a href="mailto:achadoseperdidos@iflocaliza.local">achadoseperdidos@iflocaliza.local</a></p>
+                    <p><strong>Horário:</strong> Segunda a sexta, das 8h às 18h</p>
+                </address>
+            </div>
+        </section>
+    </main>
+
+    <template id="item-card-template">
+        <article class="item-card" data-item-card>
+            <header>
+                <p data-item-status>Status</p>
+                <h3 data-item-name>Nome do item</h3>
+            </header>
+            <p data-item-description>Descrição do item</p>
+            <dl>
+                <div>
+                    <dt>Categoria</dt>
+                    <dd data-item-category>Categoria</dd>
+                </div>
+                <div>
+                    <dt>Local</dt>
+                    <dd data-item-location>Local</dd>
+                </div>
+                <div>
+                    <dt>Data</dt>
+                    <dd data-item-date>Data</dd>
+                </div>
+            </dl>
+            <button type="button" data-action="open-item-details">Ver detalhes</button>
+        </article>
+    </template>
+
+    <footer class="app-footer" data-component="app-footer">
+        <div class="container">
+            <p>&copy; 2026 IF Localiza. Sistema de achados e perdidos.</p>
+        </div>
+    </footer>
+</body>
+</html>
