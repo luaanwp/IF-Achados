@@ -6,11 +6,18 @@ function CadastroObjeto() {
   const navigate = useNavigate()
   const [nome, setNome] = useState('')
   const [categoria, setCategoria] = useState('')
-  const [descricao, setDescricao] = useState('')
   const [local, setLocal] = useState('')
   const [data, setData] = useState('')
   const [foto, setFoto] = useState(null)
-  
+  const [descricao, setDescricao] = useState("");
+
+const handleDescricao = (e) => {
+  const value = e.target.value;
+
+  if (value.length <= 600) {
+    setDescricao(value);
+  }
+};
   // Referência para o input de arquivo oculto
   const fileInputRef = useRef(null)
 
@@ -81,9 +88,12 @@ function CadastroObjeto() {
               rows="4" 
               placeholder="Descreva o objeto encontrado... " 
               value={descricao}
-              onChange={(e) => setDescricao(e.target.value)}
-              required
+              onChange= {handleDescricao}
+              
             ></textarea>
+            <div className="char-counter">
+              {descricao.length}/600
+          </div>
           </div>
 
           <div className="form-row-2">
