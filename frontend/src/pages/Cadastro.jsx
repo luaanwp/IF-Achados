@@ -1,21 +1,43 @@
 import { useState } from 'react'
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { API_URL } from '../config/api'
 
 function Cadastro() {
+  const navigate = useNavigate()
   const [nome, setNome] = useState('')
   const [email, setEmail] = useState('')
   const [senha, setSenha] = useState('')
   const [confirmarSenha, setConfirmarSenha] = useState('')
+  const [carregando, setCarregando] = useState(false)
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault()
     if (senha !== confirmarSenha) {
-      alert('As senhas não coincidem.')
+      alert('As senhas introduzidas não coincidem.')
       return
     }
-    // TODO: integrar com POST {API_URL}/api/usuarios
-    console.log('cadastro de usuario', { nome, email, senha, API_URL })
+
+    setCarregando(true)
+    try {
+      const response = await fetch(`${API_URL}/api/usuarios`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ nome, email, senha }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Ocorreu um erro ao realizar o cadastro. Tente novamente.')
+      }
+
+      alert('Conta criada com sucesso! A redirecionar para a página de Login...')
+      navigate({ to: '/login' })
+    } catch (error) {
+      alert(error.message)
+    } finally {
+      setCarregando(false)
+    }
   }
 
   return (
@@ -79,8 +101,8 @@ function Cadastro() {
             />
           </div>
 
-          <button type="submit" className="btn btn-primary btn-block">
-            Criar Conta
+          <button type="submit" className="btn btn-primary btn-block" disabled={carregando}>
+            {carregando ? 'A criar conta...' : 'Criar Conta'}
           </button>
         </form>
 

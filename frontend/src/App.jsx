@@ -1,43 +1,29 @@
-import { Outlet, Link } from '@tanstack/react-router'
+import { Outlet, Link, useRouterState } from '@tanstack/react-router'
 
 function App() {
+  // Hook do tanstack-router para saber a rota atual e marcar o menu como "active"
+  const routerState = useRouterState();
+  const currentPath = routerState.location.pathname;
+
   return (
-    <div className="app-shell">
-      <header className="app-header">
-        <div className="container">
-          <Link to="/" className="logo">
-            <span className="logo-mark" aria-hidden="true">
-              <span /><span /><span />
-              <span /><span /><span />
-              <span /><span /><span />
-            </span>
-            <span className="logo-text">IF ACHADOS</span>
-          </Link>
-
-          <nav className="primary-navigation" aria-label="Navegação principal">
-            <Link to="/">Início</Link>
-            <Link to="/objetos">Objetos</Link>
-            <Link to="/objetos/novo">Cadastrar item</Link>
-            <a href="#categorias">Categorias</a>
-            <a href="#sobre">Sobre</a>
-          </nav>
-
-          <Link to="/login" className="btn btn-primary btn-sm">
-            Login
+    <>
+      <header className="navbar">
+        <div className="logo">
+          <Link to="/">
+            <i className="fa-solid fa-layer-group"></i> IF <span>ACHADOS</span>
           </Link>
         </div>
+        <nav>
+          <Link to="/" className={currentPath === '/' ? 'active' : ''}>Início</Link>
+          <Link to="/objetos" className={currentPath.startsWith('/objetos') ? 'active' : ''}>Objetos</Link>
+          {/* Supondo que você crie a rota /painel depois */}
+          <Link to="/login" className="btn-login-nav">Login</Link>
+        </nav>
       </header>
 
-      <main id="conteudo-principal">
-        <Outlet />
-      </main>
-
-      <footer className="app-footer">
-        <div className="container">
-          <p>&copy; 2026 IF Achados. Sistema de achados e perdidos do IFMA Campus Grajaú.</p>
-        </div>
-      </footer>
-    </div>
+      {/* O Outlet renderiza as páginas filhas dependendo da rota */}
+      <Outlet />
+    </>
   )
 }
 

@@ -9,11 +9,47 @@ function CadastroObjeto() {
   const [descricao, setDescricao] = useState('')
   const [local, setLocal] = useState('')
   const [data, setData] = useState('')
+  const [foto, setFoto] = useState(null)
+  const [carregando, setCarregando] = useState(false)
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault()
-    // TODO: integrar com POST {API_URL}/api/objetos (multipart, se incluir a foto)
-    console.log('novo objeto', { nome, categoria, descricao, local, data, API_URL })
+    setCarregando(true)
+
+    try {
+      // Usando FormData para dar suporte ao upload do ficheiro binário da foto
+      const formData = new FormData()
+      formData.append('nome', nome)
+      formData.append('categoria', categoria)
+      formData.append('descricao', descricao)
+      formData.append('local', local)
+      formData.append('data', data)
+      if (foto) {
+        formData.append('foto', foto)
+      }
+
+      const response = await fetch(`${API_URL}/api/objetos`, {
+        method: 'POST',
+        body: formData, // O fetch infere automaticamente o header Content-Type como multipart/form-data
+      })
+
+      if (!response.ok) {
+        throw new Error('Falha ao cadastrar o objeto. Verifique as informações fornecidas.')
+      }
+
+      alert('Objeto cadastrado com sucesso!')
+      navigate({ to: '/objetos' })
+    } catch (error) {
+      alert(error.message)
+    } finally {
+      setCarregando(false)
+    }
+  }
+
+  function handleFileChange(event) {
+    if (event.target.files.length > 0) {
+      setFoto(event.target.files[0])
+    }
   }
 
   return (
@@ -42,7 +78,7 @@ function CadastroObjeto() {
             onChange={(event) => setCategoria(event.target.value)}
             required
           >
-            <option value="">Selecione uma categoria</option>
+            <option value="" disabled>Selecione uma categoria</option>
             <option value="documentos">Documentos</option>
             <option value="eletronicos">Eletrônicos</option>
             <option value="materiais">Materiais Escolares</option>
@@ -55,8 +91,8 @@ function CadastroObjeto() {
           <label htmlFor="descricao">Descrição</label>
           <textarea
             id="descricao"
-            rows={3}
-            placeholder="Descreva o objeto encontrado..."
+            rows={4}
+            placeholder="Descreva o objeto encontrado (características, marcas corporativas, cor)..."
             value={descricao}
             onChange={(event) => setDescricao(event.target.value)}
             required
@@ -90,18 +126,29 @@ function CadastroObjeto() {
 
         <div>
           <label htmlFor="foto">Foto do objeto</label>
-          <label htmlFor="foto" className="dropzone">
-            📷 Clique para selecionar uma imagem ou arraste e solte aqui
+          <label htmlFor="foto" className="dropzone" style={{ cursor: 'pointer' }}>
+            {foto ? `Selecionado: ${foto.name}` : '📷 Clique para selecionar uma imagem'}
           </label>
-          <input id="foto" type="file" accept="image/*" style={{ display: 'none' }} />
+          <input 
+            id="foto" 
+            type="file" 
+            accept="image/*" 
+            style={{ display: 'none' }} 
+            onChange={handleFileChange}
+          />
         </div>
 
         <div className="form-actions">
-          <button type="button" className="btn btn-outline" onClick={() => navigate({ to: '/objetos' })}>
+          <button 
+            type="button" 
+            className="btn btn-outline" 
+            onClick={() => navigate({ to: '/objetos' })}
+            disabled={carregando}
+          >
             Cancelar
           </button>
-          <button type="submit" className="btn btn-primary">
-            Salvar
+          <button type="submit" className="btn btn-primary" disabled={carregando}>
+            {carregando ? 'A salvar...' : 'Salvar'}
           </button>
         </div>
       </form>
