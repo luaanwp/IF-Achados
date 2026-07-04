@@ -8,56 +8,77 @@ function Login() {
 
   function handleSubmit(event) {
     event.preventDefault()
-    // TODO: integrar com POST {API_URL}/api/login
+
+    // TODO: integrar com POST `${API_URL}/api/login`
     console.log('login', { email, senha, API_URL })
   }
 
   return (
-    <div className="auth-wrapper">
-      <div className="auth-card">
-        <span className="logo-mark logo-mark-lg" aria-hidden="true">
-          <span /><span /><span />
-          <span /><span /><span />
-          <span /><span /><span />
-        </span>
+    <div className="bg-split">
+    <div className="auth-container">
+      <div className="card-form">
 
-        <h1>IF ACHADOS</h1>
-        <p className="auth-subtitle">Bem-vindo de volta! Faça login para continuar.</p>
+        <div className="logo-center">
+          <i className="fa-solid fa-layer-group"></i>
+          {' '}IF <span>ACHADOS</span>
+        </div>
+
+        <h2>Bem-vindo de volta!</h2>
+
+        <p className="subtitle">
+          Faça login para continuar
+        </p>
 
         <form onSubmit={handleSubmit}>
-          <div>
+
+          <div className="form-group">
             <label htmlFor="email">E-mail</label>
+
             <input
               id="email"
               type="email"
               placeholder="seu@email.com"
               value={email}
-              onChange={(event) => setEmail(event.target.value)}
+              onChange={(e) => setEmail(e.target.value)}
               required
             />
           </div>
 
-          <div>
+          <div className="form-group">
             <label htmlFor="senha">Senha</label>
-            <input
-              id="senha"
-              type="password"
-              placeholder="••••••••••"
-              value={senha}
-              onChange={(event) => setSenha(event.target.value)}
-              required
-            />
+
+            <div className="password-wrapper">
+              <input
+                id="senha"
+                type="password"
+                placeholder="••••••••"
+                value={senha}
+                onChange={(e) => setSenha(e.target.value)}
+                required
+              />
+
+              <i className="fa-regular fa-eye toggle-password"></i>
+            </div>
           </div>
 
-          <button type="submit" className="btn btn-primary btn-block">
+          <button
+            type="submit"
+            className="btn-submit"
+          >
             Entrar
           </button>
+
         </form>
 
-        <p className="auth-switch">
-          Não tem uma conta? <Link to="/cadastro">Criar conta</Link>
+        <p className="form-footer">
+          Não tem uma conta?{' '}
+          <Link to="/cadastro">
+            Criar conta
+          </Link>
         </p>
+
       </div>
+    </div>
     </div>
   )
 }

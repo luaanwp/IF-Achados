@@ -1,15 +1,32 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { API_URL } from '../config/api'
-import ItemCard from '../components/ItemCard'
 
-const CATEGORIAS = [
-  { nome: 'Documentos', icone: '📄', slug: 'documentos' },
-  { nome: 'Eletrônicos', icone: '📱', slug: 'eletronicos' },
-  { nome: 'Materiais Escolares', icone: '✏️', slug: 'materiais' },
-  { nome: 'Vestuário', icone: '👕', slug: 'vestuario' },
-  { nome: 'Outros', icone: '⋯', slug: 'outros' },
-]
+// Criamos o componente do Card igualzinho ao seu HTML
+function ItemCard({ objeto }) {
+  const isDisponivel = objeto.status !== 'devolvido';
+  
+  // Definindo a cor da tag baseado na categoria
+  let catClass = "cat-outros";
+  if (objeto.categoria === "documentos") catClass = "cat-doc";
+  else if (objeto.categoria === "eletronicos") catClass = "cat-eletr";
+  else if (objeto.categoria === "materiais") catClass = "cat-mat";
+  else if (objeto.categoria === "vestuario") catClass = "cat-vest";
+
+  return (
+    <div className="obj-card">
+      <div className="img-placeholder"><i className="fa-regular fa-image"></i></div>
+      <div className="obj-info">
+        <h4>{objeto.nome}</h4>
+        <span className={`tag ${catClass}`}>{objeto.categoria}</span>
+        <span className={`tag ${isDisponivel ? 'status-disp' : 'status-dev'}`}>
+          {isDisponivel ? 'Disponível' : 'Devolvido'}
+        </span>
+        <Link to={`/objetos/${objeto.id}`} className="btn-detalhes">Ver Detalhes</Link>
+      </div>
+    </div>
+  )
+}
 
 function Home() {
   const [objetos, setObjetos] = useState([])
@@ -30,7 +47,6 @@ function Home() {
 
   function handleSearch(event) {
     event.preventDefault()
-    // Redireciona para a página de listagem injetando a query de busca nos parâmetros da URL
     navigate({
       to: '/objetos',
       search: { busca: busca || undefined }
@@ -38,64 +54,45 @@ function Home() {
   }
 
   return (
-    <>
-      <section className="app-intro">
-        <div className="container">
-          <h1>Encontre o que você perdeu</h1>
-          <p>Pesquise objetos encontrados no IFMA Campus Grajaú.</p>
+    <main className="container">
+      {/* Seção do Banner Principal */}
+      <section className="hero">
+        <h1>Encontre o que você perdeu</h1>
+        <p>Pesquise objetos encontrados no IFMA Campus Grajaú.</p>
+        <form onSubmit={handleSearch} className="search-bar">
+          <input 
+            type="text" 
+            name="busca" 
+            placeholder="Buscar objeto..." 
+            value={busca}
+            onChange={(e) => setBusca(e.target.value)}
+          />
+          <button type="submit"><i className="fa-solid fa-magnifying-glass"></i></button>
+        </form>
+      </section>
 
-          <form className="search-bar" role="search" onSubmit={handleSearch}>
-            <input 
-              type="search" 
-              placeholder="Buscar objeto..." 
-              aria-label="Buscar objeto" 
-              value={busca}
-              onChange={(e) => setBusca(e.target.value)}
-            />
-            <button type="submit" className="btn btn-primary">
-              Buscar
-            </button>
-          </form>
+      {/* Seção de Últimos Registros */}
+      <section className="recent-objects">
+        <div className="section-header">
+          <h2>Últimos Registros</h2>
+          <Link to="/objetos" className="link-more">
+            Ver todos <i className="fa-solid fa-arrow-right"></i>
+          </Link>
+        </div>
+        
+        {carregando && <p style={{textAlign: 'center', margin: '20px 0'}}>Carregando registros...</p>}
+        {!carregando && objetos.length === 0 && (
+          <p style={{textAlign: 'center', margin: '20px 0'}}>Nenhum objeto cadastrado ainda.</p>
+        )}
 
-          <div className="section-heading" style={{ marginTop: '2rem' }}>
-            <h2 style={{ fontSize: '1.1rem' }}>Categorias</h2>
-            <Link to="/objetos">Ver todas</Link>
-          </div>
-
-          <div className="category-grid">
-            {CATEGORIAS.map((categoria) => (
-              <button 
-                key={categoria.nome} 
-                type="button" 
-                className="category-tile"
-                onClick={() => navigate({ to: '/objetos', search: { categoria: categoria.slug } })}
-              >
-                <span className="category-tile-icon" aria-hidden="true">
-                  {categoria.icone}
-                </span>
-                {categoria.nome}
-              </button>
-            ))}
-          </div>
-
-          <div className="section-heading" style={{ marginTop: '2rem' }}>
-            <h2 style={{ fontSize: '1.1rem' }}>Objetos recentes encontrados</h2>
-            <Link to="/objetos">Ver todos</Link>
-          </div>
-
-          {carregando && <p>A carregar itens recentes...</p>}
-          {!carregando && objetos.length === 0 && (
-            <p>Nenhum objeto cadastrado ainda no sistema.</p>
-          )}
-
-          <div className="item-grid">
-            {objetos.map((objeto) => (
-              <ItemCard key={objeto.id} objeto={objeto} />
-            ))}
-          </div>
+        {/* Grid de Objetos */}
+        <div className="objects-grid">
+          {objetos.map((objeto) => (
+            <ItemCard key={objeto.id} objeto={objeto} />
+          ))}
         </div>
       </section>
-    </>
+    </main>
   )
 }
 

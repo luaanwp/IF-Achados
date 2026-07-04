@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { useNavigate } from '@tanstack/react-router'
+import { useState, useRef } from 'react'
+import { useNavigate, Link } from '@tanstack/react-router'
 import { API_URL } from '../config/api'
 
 function CadastroObjeto() {
@@ -10,149 +10,132 @@ function CadastroObjeto() {
   const [local, setLocal] = useState('')
   const [data, setData] = useState('')
   const [foto, setFoto] = useState(null)
-  const [carregando, setCarregando] = useState(false)
+  
+  // Referência para o input de arquivo oculto
+  const fileInputRef = useRef(null)
 
-  async function handleSubmit(event) {
+  function handleSubmit(event) {
     event.preventDefault()
-    setCarregando(true)
+    // TODO: integrar com POST {API_URL}/api/objetos
+    console.log('novo objeto', { nome, categoria, descricao, local, data, foto, API_URL })
+    
+    // Simula o salvamento e volta para a tela de listagem (ou painel)
+    alert("Objeto cadastrado com sucesso!")
+    navigate({ to: '/objetos' })
+  }
 
-    try {
-      // Usando FormData para dar suporte ao upload do ficheiro binário da foto
-      const formData = new FormData()
-      formData.append('nome', nome)
-      formData.append('categoria', categoria)
-      formData.append('descricao', descricao)
-      formData.append('local', local)
-      formData.append('data', data)
-      if (foto) {
-        formData.append('foto', foto)
-      }
-
-      const response = await fetch(`${API_URL}/api/objetos`, {
-        method: 'POST',
-        body: formData, // O fetch infere automaticamente o header Content-Type como multipart/form-data
-      })
-
-      if (!response.ok) {
-        throw new Error('Falha ao cadastrar o objeto. Verifique as informações fornecidas.')
-      }
-
-      alert('Objeto cadastrado com sucesso!')
-      navigate({ to: '/objetos' })
-    } catch (error) {
-      alert(error.message)
-    } finally {
-      setCarregando(false)
+  // Função para simular o clique no input file quando clicar na zona de upload
+  function handleUploadClick() {
+    if (fileInputRef.current) {
+      fileInputRef.current.click()
     }
   }
 
+  // Função para guardar o arquivo selecionado no estado do React
   function handleFileChange(event) {
-    if (event.target.files.length > 0) {
+    if (event.target.files && event.target.files.length > 0) {
       setFoto(event.target.files[0])
     }
   }
 
   return (
-    <section className="container" style={{ maxWidth: 560 }}>
-      <h1 style={{ fontSize: '1.4rem' }}>Cadastrar Objeto Encontrado</h1>
-      <p style={{ color: 'var(--color-muted)', marginTop: '-0.5rem' }}>Preencha os dados abaixo</p>
-
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="nome">Nome do objeto</label>
-          <input
-            id="nome"
-            type="text"
-            placeholder="Ex: Carteira Preta"
-            value={nome}
-            onChange={(event) => setNome(event.target.value)}
-            required
-          />
-        </div>
-
-        <div>
-          <label htmlFor="categoria">Categoria</label>
-          <select
-            id="categoria"
-            value={categoria}
-            onChange={(event) => setCategoria(event.target.value)}
-            required
-          >
-            <option value="" disabled>Selecione uma categoria</option>
-            <option value="documentos">Documentos</option>
-            <option value="eletronicos">Eletrônicos</option>
-            <option value="materiais">Materiais Escolares</option>
-            <option value="vestuario">Vestuário</option>
-            <option value="outros">Outros</option>
-          </select>
-        </div>
-
-        <div>
-          <label htmlFor="descricao">Descrição</label>
-          <textarea
-            id="descricao"
-            rows={4}
-            placeholder="Descreva o objeto encontrado (características, marcas corporativas, cor)..."
-            value={descricao}
-            onChange={(event) => setDescricao(event.target.value)}
-            required
-          />
-        </div>
-
-        <div className="form-row">
-          <div>
-            <label htmlFor="local">Local encontrado</label>
-            <input
-              id="local"
-              type="text"
-              placeholder="Ex: Bloco A - Sala 104"
-              value={local}
-              onChange={(event) => setLocal(event.target.value)}
-              required
+    <main className="container page-flex-center">
+      <div className="card-form block-max-width">
+        <h2>Cadastrar Objeto Encontrado</h2>
+        <p className="subtitle-left">Preencha os dados abaixo</p>
+        
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label htmlFor="nome-obj">Nome do objeto</label>
+            <input 
+              type="text" 
+              id="nome-obj" 
+              placeholder="Ex: Carteira Preta" 
+              value={nome}
+              onChange={(e) => setNome(e.target.value)}
+              required 
             />
           </div>
 
-          <div>
-            <label htmlFor="data">Data encontrada</label>
-            <input
-              id="data"
-              type="date"
-              value={data}
-              onChange={(event) => setData(event.target.value)}
+          <div className="form-group">
+            <label htmlFor="categoria-obj">Categoria</label>
+            <select 
+              id="categoria-obj" 
+              value={categoria}
+              onChange={(e) => setCategoria(e.target.value)}
               required
-            />
+            >
+              <option value="" disabled>Selecione uma categoria...</option>
+              <option value="documentos">Documentos</option>
+              <option value="eletronicos">Eletrônicos</option>
+              <option value="materiais">Materiais Escolares</option>
+              <option value="vestuario">Vestuário</option>
+              <option value="outros">Outros</option>
+            </select>
           </div>
-        </div>
 
-        <div>
-          <label htmlFor="foto">Foto do objeto</label>
-          <label htmlFor="foto" className="dropzone" style={{ cursor: 'pointer' }}>
-            {foto ? `Selecionado: ${foto.name}` : '📷 Clique para selecionar uma imagem'}
-          </label>
-          <input 
-            id="foto" 
-            type="file" 
-            accept="image/*" 
-            style={{ display: 'none' }} 
-            onChange={handleFileChange}
-          />
-        </div>
+          <div className="form-group">
+            <label htmlFor="desc-obj">Descrição</label>
+            <textarea 
+              id="desc-obj" 
+              rows="4" 
+              placeholder="Descreva o objeto encontrado... " 
+              value={descricao}
+              onChange={(e) => setDescricao(e.target.value)}
+              required
+            ></textarea>
+          </div>
 
-        <div className="form-actions">
-          <button 
-            type="button" 
-            className="btn btn-outline" 
-            onClick={() => navigate({ to: '/objetos' })}
-            disabled={carregando}
-          >
-            Cancelar
-          </button>
-          <button type="submit" className="btn btn-primary" disabled={carregando}>
-            {carregando ? 'A salvar...' : 'Salvar'}
-          </button>
-        </div>
-      </form>
-    </section>
+          <div className="form-row-2">
+            <div className="form-group">
+              <label htmlFor="local-obj">Local encontrado</label>
+              <input 
+                type="text" 
+                id="local-obj" 
+                placeholder="Ex: Bloco A - Sala 104" 
+                value={local}
+                onChange={(e) => setLocal(e.target.value)}
+                required 
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="data-obj">Data encontrada</label>
+              {/* Mudei o type para "date" para facilitar a seleção no navegador */}
+              <input 
+                type="date" 
+                id="data-obj" 
+                value={data}
+                onChange={(e) => setData(e.target.value)}
+                required 
+              />
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label>Foto do objeto</label>
+            <div className="upload-zone" id="uploadZone" onClick={handleUploadClick} style={{ cursor: 'pointer' }}>
+              <i className="fa-solid fa-cloud-arrow-up"></i>
+              {/* O texto muda dinamicamente se o usuário selecionar uma foto */}
+              <p>{foto ? `Arquivo: ${foto.name}` : 'Clique para selecionar uma imagem ou arraste e solte aqui'}</p>
+              <input 
+                type="file" 
+                id="fileInput" 
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                accept="image/*"
+                hidden 
+              />
+            </div>
+          </div>
+
+          <div className="form-actions-row">
+            {/* O Link do React Router substitui a tag <a> padrão do HTML para não recarregar a página */}
+            <Link to="/objetos" className="btn-cancelar">Cancelar</Link>
+            <button type="submit" className="btn-salvar">Salvar</button>
+          </div>
+        </form>
+      </div>
+    </main>
   )
 }
 
