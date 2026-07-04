@@ -53,47 +53,105 @@ function Home() {
     })
   }
 
-  return (
-    <main className="container">
-      {/* Seção do Banner Principal */}
-      <section className="hero">
-        <h1>Encontre o que você perdeu</h1>
-        <p>Pesquise objetos encontrados no IFMA Campus Grajaú.</p>
-        <form onSubmit={handleSearch} className="search-bar">
-          <input 
-            type="text" 
-            name="busca" 
-            placeholder="Buscar objeto..." 
-            value={busca}
-            onChange={(e) => setBusca(e.target.value)}
-          />
-          <button type="submit"><i className="fa-solid fa-magnifying-glass"></i></button>
-        </form>
-      </section>
+return (
+  <main className="container">
 
-      {/* Seção de Últimos Registros */}
-      <section className="recent-objects">
-        <div className="section-header">
-          <h2>Últimos Registros</h2>
-          <Link to="/objetos" className="link-more">
-            Ver todos <i className="fa-solid fa-arrow-right"></i>
-          </Link>
-        </div>
-        
-        {carregando && <p style={{textAlign: 'center', margin: '20px 0'}}>Carregando registros...</p>}
-        {!carregando && objetos.length === 0 && (
-          <p style={{textAlign: 'center', margin: '20px 0'}}>Nenhum objeto cadastrado ainda.</p>
-        )}
+    {/* Banner Principal */}
+    <section className="hero">
+      <h1>Encontre o que você perdeu</h1>
+      <p>Pesquise objetos encontrados no IFMA Campus Grajaú.</p>
 
-        {/* Grid de Objetos */}
-        <div className="objects-grid">
+      <form onSubmit={handleSearch} className="search-bar">
+        <input
+          type="text"
+          name="busca"
+          placeholder="Buscar objeto..."
+          value={busca}
+          onChange={(e) => setBusca(e.target.value)}
+        />
+
+        <button type="submit">
+          <i className="fa-solid fa-magnifying-glass"></i>
+        </button>
+      </form>
+    </section>
+
+    {/* Categorias */}
+    <section className="section-block">
+      <div className="sec-header">
+        <h3>Categorias</h3>
+
+        <Link to="/objetos" className="ver-todas">
+          Ver todas
+        </Link>
+      </div>
+
+      <div className="grid-categorias">
+
+        <Link to="/objetos?categoria=documentos" className="cat-card">
+          <i className="fa-regular fa-id-card"></i>
+          <span>Documentos</span>
+        </Link>
+
+        <Link to="/objetos?categoria=eletronicos" className="cat-card">
+          <i className="fa-solid fa-laptop"></i>
+          <span>Eletrônicos</span>
+        </Link>
+
+        <Link to="/objetos?categoria=materiais" className="cat-card">
+          <i className="fa-solid fa-book-open"></i>
+          <span>Materiais Escolares</span>
+        </Link>
+
+        <Link to="/objetos?categoria=vestuario" className="cat-card">
+          <i className="fa-solid fa-shirt"></i>
+          <span>Vestuário</span>
+        </Link>
+
+        <Link to="/objetos" className="cat-card">
+          <i className="fa-solid fa-ellipsis"></i>
+          <span>Outros</span>
+        </Link>
+
+      </div>
+    </section>
+
+    {/* Objetos encontrados */}
+    <section className="section-block">
+      <div className="sec-header">
+        <h3>Objetos encontrados</h3>
+
+        <Link to="/objetos" className="ver-todas">
+          Ver todos
+        </Link>
+      </div>
+
+      {carregando && (
+        <p style={{ textAlign: 'center', margin: '20px 0' }}>
+          Carregando registros...
+        </p>
+      )}
+
+      {!carregando && objetos.length === 0 && (
+        <p style={{ textAlign: 'center', margin: '20px 0' }}>
+          Nenhum objeto cadastrado ainda.
+        </p>
+      )}
+
+      {!carregando && objetos.length > 0 && (
+        <div className="grid-objetos">
           {objetos.map((objeto) => (
-            <ItemCard key={objeto.id} objeto={objeto} />
+            <ItemCard
+              key={objeto.id}
+              objeto={objeto}
+            />
           ))}
         </div>
-      </section>
-    </main>
-  )
+      )}
+    </section>
+
+  </main>
+)
 }
 
 export default Home

@@ -16,9 +16,13 @@ function ObjetoDetalhes() {
         return response.json()
       })
       .then(setObjeto)
-      .catch(setErro)
+      .catch((error) => {
+    console.error(error)
+    setErro(error.message)
+    })
       .finally(() => setCarregando(false))
-  }, [objetoId])
+  }, [objetoId]) 
+
 
   // Função baseada no script.js novo (Marcar como devolvido)
   const handleMarcarDevolvido = () => {
@@ -30,7 +34,19 @@ function ObjetoDetalhes() {
   if (carregando) return <main className="container"><p>Carregando detalhes do objeto...</p></main>
   if (erro) return <main className="container"><p role="alert">Não foi possível carregar este item.</p></main>
   if (!objeto) return null;
+  let categoriaClass = 'cat-outros'
 
+if (objeto.categoria === 'documentos')
+  categoriaClass = 'cat-doc'
+else if (objeto.categoria === 'eletronicos')
+  categoriaClass = 'cat-eletr'
+else if (objeto.categoria === 'materiais')
+  categoriaClass = 'cat-mat'
+else if (objeto.categoria === 'vestuario')
+  categoriaClass = 'cat-vest'
+const dataFormatada = objeto?.data
+  ? new Date(objeto.data).toLocaleString('pt-BR')
+  : ''
   return (
     <main className="container">
       <div className="back-link-wrapper">
@@ -51,7 +67,9 @@ function ObjetoDetalhes() {
           <div className="info-group-item">
             <span className="label">Categoria:</span>
             {/* Lógica simples para mudar a cor da tag baseado na categoria se quiser */}
-            <span className="tag cat-doc font-md">{objeto.categoria}</span>
+              <span className={`tag ${categoriaClass} font-md`}>
+                {objeto.categoria}
+              </span>
           </div>
 
           <div className="info-group-item">
@@ -66,7 +84,7 @@ function ObjetoDetalhes() {
 
           <div className="info-group-item">
             <span className="label">Data do registro:</span>
-            <p className="data-text">{objeto.data}</p>
+            <p className="data-text">{dataFormatada}</p>
           </div>
 
           <div className="info-group-item">
@@ -77,9 +95,12 @@ function ObjetoDetalhes() {
           </div>
 
           <div className="details-actions">
-            <Link to="/objetos" className="btn-secondary">Voltar</Link>
-            <button className="btn-danger-action" onClick={handleMarcarDevolvido}>
-              Marcar como Devolvido
+            <button
+              type="button"
+                className="btn-secondary"
+                onClick={() => window.history.back()}
+              >
+                Voltar
             </button>
           </div>
         </div>
