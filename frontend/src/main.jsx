@@ -1,14 +1,12 @@
-import ReactDOM from "react-dom/client"
-import BuscaSection from "./components/BuscaSection"
-import CadastroSection from "./components/CadastroSection"
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import { RouterProvider } from '@tanstack/react-router'
 
-const rootBusca = document.getElementById("root-busca")
-const rootCadastro = document.getElementById("root-cadastro")
+import { router } from './router'
+import './styles/global.css'
 
-if (rootBusca) {
-  ReactDOM.createRoot(rootBusca).render(<BuscaSection />)
-}
-
-if (rootCadastro) {
-  ReactDOM.createRoot(rootCadastro).render(<CadastroSection />)
-}
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <RouterProvider router={router} />
+  </React.StrictMode>,
+)
