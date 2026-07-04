@@ -5,3 +5,5 @@ target/
 .vscode/
 .env
 *.log
+### Mysql ###
+application.properties
