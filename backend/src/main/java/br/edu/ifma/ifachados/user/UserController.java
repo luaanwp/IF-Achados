@@ -58,7 +58,7 @@ public User upload(@ModelAttribute UserDTO dto) {
         user.setNome(dto.getNome());
         user.setEmail(dto.getEmail());
         user.setSenha(dto.getSenha());
-        user.setImagemUrl(caminho);
+        user.setImagemUrl("http://localhost:8080/uploads/" + nomeArquivo);
 
         return userRepository.save(user);
 
