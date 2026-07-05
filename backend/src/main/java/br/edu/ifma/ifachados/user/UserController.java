@@ -1,8 +1,11 @@
 package br.edu.ifma.ifachados.user;
 
+import org.springframework.web.bind.annotation.ModelAttribute;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import br.edu.ifma.ifachados.user.dto.UserDTO;
+import java.io.File;
 
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
@@ -35,4 +38,33 @@ public class UserController {
     public void deletar(@PathVariable Long id) {
         userRepository.deleteById(id);
     }
+   @PostMapping("/upload")
+public User upload(@ModelAttribute UserDTO dto) {
+
+    try {
+        File pasta = new File("uploads");
+        if (!pasta.exists()) {
+            pasta.mkdir();
+        }
+
+        String nomeArquivo = java.util.UUID.randomUUID() + "_" +
+                dto.getImagem().getOriginalFilename();
+
+        String caminho = System.getProperty("user.dir") + "/uploads/" + nomeArquivo;
+
+        dto.getImagem().transferTo(new File(caminho));
+
+        User user = new User();
+        user.setNome(dto.getNome());
+        user.setEmail(dto.getEmail());
+        user.setSenha(dto.getSenha());
+        user.setImagemUrl(caminho);
+
+        return userRepository.save(user);
+
+    } catch (Exception e) {
+        e.printStackTrace();
+        return null;
+    }
+}
 }

@@ -14,6 +14,8 @@ public class User {
 
     private String nome;
     private String email;
+    private String senha;
+    private String imagemUrl;
 
     // Getters e Setters
     public Long getId() { return id; }
@@ -24,4 +26,8 @@ public class User {
 
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
+    public String getSenha() { return senha; }
+    public void setSenha(String senha) { this.senha = senha; }
+    public String getImagemUrl() { return imagemUrl; }
+    public void setImagemUrl(String imagemUrl) { this.imagemUrl = imagemUrl; }
 }
