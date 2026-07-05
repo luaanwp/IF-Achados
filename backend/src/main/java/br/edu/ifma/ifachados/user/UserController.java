@@ -90,8 +90,12 @@ public class UserController {
                 pasta.mkdir();
             }
 
-            String nomeArquivo = java.util.UUID.randomUUID() + "_" +
-                    dto.getImagem().getOriginalFilename();
+            String nomeOriginal = dto.getImagem().getOriginalFilename();
+            // Remove qualquer caractere que não seja letra, número, ponto ou hífen
+            // (evita espaços, parênteses, acentos etc. quebrando a URL depois)
+            String nomeLimpo = nomeOriginal.replaceAll("[^a-zA-Z0-9.-]", "_");
+
+            String nomeArquivo = java.util.UUID.randomUUID() + "_" + nomeLimpo;
 
             String caminho = System.getProperty("user.dir") + "/uploads/" + nomeArquivo;
 
