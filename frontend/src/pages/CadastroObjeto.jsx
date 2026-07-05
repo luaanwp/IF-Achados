@@ -13,8 +13,6 @@ function CadastroObjeto() {
 
   // Referência para o textarea, usada para ajustar a altura automaticamente
   const descricaoRef = useRef(null)
-const enviandosub = useState('')
-const erromsg = useState('')
 const handleDescricao = (e) => {
   const value = e.target.value;
 
