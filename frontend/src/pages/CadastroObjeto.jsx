@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect, use } from 'react'
 import { useNavigate, Link } from '@tanstack/react-router'
 import { API_URL } from '../config/api'
 
@@ -11,6 +11,10 @@ function CadastroObjeto() {
   const [foto, setFoto] = useState(null)
   const [descricao, setDescricao] = useState("");
 
+  // Referência para o textarea, usada para ajustar a altura automaticamente
+  const descricaoRef = useRef(null)
+const enviandosub = useState('')
+const erromsg = useState('')
 const handleDescricao = (e) => {
   const value = e.target.value;
 
@@ -18,6 +22,16 @@ const handleDescricao = (e) => {
     setDescricao(value);
   }
 };
+
+  // Ajusta a altura do textarea sempre que o texto mudar
+  useEffect(() => {
+    const el = descricaoRef.current
+    if (el) {
+      el.style.height = 'auto' // reseta para recalcular corretamente ao apagar texto
+      el.style.height = `${el.scrollHeight}px`
+    }
+  }, [descricao])
+
   // Referência para o input de arquivo oculto
   const fileInputRef = useRef(null)
 
@@ -85,6 +99,7 @@ const handleDescricao = (e) => {
             <label htmlFor="desc-obj">Descrição</label>
             <textarea 
               id="desc-obj" 
+              ref={descricaoRef}
               rows="4" 
               placeholder="Descreva o objeto encontrado... " 
               value={descricao}
