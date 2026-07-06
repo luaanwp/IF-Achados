@@ -64,18 +64,19 @@ function Painel() {
               <tbody>
                 {objetos.map((objeto) => {
                   const isDisponivel = objeto.status !== 'devolvido';
-                  
+                  const categoriaNome = objeto.categoria.nome.toLowerCase();
+
                   let catClass = "cat-outros";
-                  if (objeto.categoria === "documentos") catClass = "cat-doc";
-                  else if (objeto.categoria === "eletronicos") catClass = "cat-eletr";
-                  else if (objeto.categoria === "materiais") catClass = "cat-mat";
-                  else if (objeto.categoria === "vestuario") catClass = "cat-vest";
+                  if (categoriaNome === "documentos") catClass = "cat-doc";
+                  else if (categoriaNome === "eletronicos") catClass = "cat-eletr";
+                  else if (categoriaNome === "materiais") catClass = "cat-mat";
+                  else if (categoriaNome === "vestuario") catClass = "cat-vest";
 
                   return (
                     <tr key={objeto.id} style={{ borderBottom: '1px solid #eee' }}>
                       <td style={{ padding: '12px' }}>#{objeto.id}</td>
                       <td style={{ padding: '12px' }}><strong>{objeto.nome}</strong></td>
-                      <td style={{ padding: '12px' }}><span className={`tag ${catClass}`}>{objeto.categoria}</span></td>
+                      <td style={{ padding: '12px' }}><span className={`tag ${catClass}`}>{objeto.categoria.nome}</span></td>
                       <td style={{ padding: '12px' }}>{objeto.local}</td>
                       <td style={{ padding: '12px' }}>{objeto.data}</td>
                       <td style={{ padding: '12px' }}>

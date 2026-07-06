@@ -11,7 +11,7 @@ function ItemCard({ objeto }) {
       <div className="img-placeholder"><i className="fa-regular fa-image"></i></div>
       <div className="obj-info">
         <h4>{objeto.nome}</h4>
-        <span className="tag cat-outros">{objeto.categoria}</span>
+        <span className="tag cat-outros">{objeto.categoria.nome}</span>
         <span className={`tag ${isDisponivel ? 'status-disp' : 'status-dev'}`}>
           {isDisponivel ? 'Disponível' : 'Devolvido'}
         </span>
