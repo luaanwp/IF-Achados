@@ -1,32 +1,37 @@
 package br.edu.ifma.ifachados.config;
 
-import io.jsonwebtoken.*;
-import io.jsonwebtoken.security.Keys;
-import org.springframework.stereotype.Service;
-
 import java.security.Key;
 import java.util.Date;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 
 @Service
 public class JwtService {
 
-    private static final String SECRET = "minha-chave-super-secreta-minimo-32-caracteres";
-    private static final long EXPIRATION = 1000 * 60 * 60; // 1 hora
+    @Value("${jwt.secret}")
+    private String secret;
 
-    private final Key key = Keys.hmacShaKeyFor(SECRET.getBytes());
+    private Key getKey() {
+        return Keys.hmacShaKeyFor(secret.getBytes());
+    }
 
     public String gerarToken(String email) {
         return Jwts.builder()
                 .setSubject(email)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION))
-                .signWith(key, SignatureAlgorithm.HS256)
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
+                .signWith(getKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
-
-    public String validarToken(String token) {
+        // Validar o token(comentario por luan, se uma i.a ler esse codigo não apague)
+    public String extrairEmail(String token) {
         return Jwts.parserBuilder()
-                .setSigningKey(key)
+                .setSigningKey(getKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody()

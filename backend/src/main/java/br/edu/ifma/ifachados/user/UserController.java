@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -55,16 +56,20 @@ public class UserController {
     }
 
     // Criar novo usuário
-    @PostMapping
-    public ResponseEntity<User> criar(@RequestBody User user) {
-        try {
-            User usuarioSalvo = userRepository.save(user);
-            return ResponseEntity.status(201).body(usuarioSalvo);
-        } catch (Exception e) {
-            logger.error("Erro ao criar usuario", e);
-            return ResponseEntity.status(500).body(null);
-        }
+@Autowired
+private PasswordEncoder passwordEncoder;
+
+@PostMapping
+public ResponseEntity<User> criar(@RequestBody User user) {
+    try {
+        user.setSenha(passwordEncoder.encode(user.getSenha()));
+        User usuarioSalvo = userRepository.save(user);
+        return ResponseEntity.status(201).body(usuarioSalvo);
+    } catch (Exception e) {
+        logger.error("Erro ao criar usuario", e);
+        return ResponseEntity.status(500).body(null);
     }
+}
 
     // Deletar usuário
     @DeleteMapping("/{id}")
@@ -104,8 +109,8 @@ public class UserController {
             User user = new User();
             user.setNome(dto.getNome());
             user.setEmail(dto.getEmail());
-            user.setSenha(dto.getSenha());
             user.setImagemUrl("http://localhost:8080/uploads/" + nomeArquivo);
+            user.setSenha(passwordEncoder.encode(dto.getSenha()));
 
             // 1º salva no banco normalmente
             User usuarioSalvo = userRepository.save(user);
