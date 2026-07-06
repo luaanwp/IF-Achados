@@ -35,14 +35,15 @@ function ObjetoDetalhes() {
   if (erro) return <main className="container"><p role="alert">Não foi possível carregar este item.</p></main>
   if (!objeto) return null;
   let categoriaClass = 'cat-outros'
+  const categoriaNome = objeto.categoria.nome.toLowerCase()
 
-if (objeto.categoria === 'documentos')
+if (categoriaNome === 'documentos')
   categoriaClass = 'cat-doc'
-else if (objeto.categoria === 'eletronicos')
+else if (categoriaNome === 'eletronicos')
   categoriaClass = 'cat-eletr'
-else if (objeto.categoria === 'materiais')
+else if (categoriaNome === 'materiais')
   categoriaClass = 'cat-mat'
-else if (objeto.categoria === 'vestuario')
+else if (categoriaNome === 'vestuario')
   categoriaClass = 'cat-vest'
 const dataFormatada = objeto?.data
   ? new Date(objeto.data).toLocaleString('pt-BR')
@@ -68,7 +69,7 @@ const dataFormatada = objeto?.data
             <span className="label">Categoria:</span>
             {/* Lógica simples para mudar a cor da tag baseado na categoria se quiser */}
               <span className={`tag ${categoriaClass} font-md`}>
-                {objeto.categoria}
+                {objeto.categoria.nome}
               </span>
           </div>
 

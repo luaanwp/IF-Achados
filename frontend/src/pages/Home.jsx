@@ -5,20 +5,21 @@ import { API_URL } from '../config/api'
 // Criamos o componente do Card igualzinho ao seu HTML
 function ItemCard({ objeto }) {
   const isDisponivel = objeto.status !== 'devolvido';
-  
+  const categoriaNome = objeto.categoria.nome.toLowerCase();
+
   // Definindo a cor da tag baseado na categoria
   let catClass = "cat-outros";
-  if (objeto.categoria === "documentos") catClass = "cat-doc";
-  else if (objeto.categoria === "eletronicos") catClass = "cat-eletr";
-  else if (objeto.categoria === "materiais") catClass = "cat-mat";
-  else if (objeto.categoria === "vestuario") catClass = "cat-vest";
+  if (categoriaNome === "documentos") catClass = "cat-doc";
+  else if (categoriaNome === "eletronicos") catClass = "cat-eletr";
+  else if (categoriaNome === "materiais") catClass = "cat-mat";
+  else if (categoriaNome === "vestuario") catClass = "cat-vest";
 
   return (
     <div className="obj-card">
       <div className="img-placeholder"><i className="fa-regular fa-image"></i></div>
       <div className="obj-info">
         <h4>{objeto.nome}</h4>
-        <span className={`tag ${catClass}`}>{objeto.categoria}</span>
+        <span className={`tag ${catClass}`}>{objeto.categoria.nome}</span>
         <span className={`tag ${isDisponivel ? 'status-disp' : 'status-dev'}`}>
           {isDisponivel ? 'Disponível' : 'Devolvido'}
         </span>
