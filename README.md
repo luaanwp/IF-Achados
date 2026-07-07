@@ -29,7 +29,7 @@ O IF-Achados foi desenvolvido com o objetivo de informatizar o processo de regis
 
 Backend
 
-Acesse a pasta `backend/` e execute o projeto Spring Boot com o Maven Wrapper quando o backend estiver disponível.
+Acesse a pasta `backend/` e execute o projeto Spring Boot com o Maven Wrapper quando o backend estiver disponível (run as java application).
 
 Frontend
 
