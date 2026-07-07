@@ -1,3 +1,9 @@
+// Define todas as rotas da aplicação usando "code-based routing" do TanStack
+// Router: cada página é uma createRoute() associada a um path e a um
+// componente, e todas viram filhas da rootRoute (que renderiza App.jsx).
+// Rotas com "$" no path (ex: $objetoId) são parâmetros dinâmicos da URL —
+// o TanStack Router casa o path mais específico automaticamente
+// (ex: /objetos/novo não conflita com /objetos/$objetoId).
 import { createRootRoute, createRoute, createRouter } from '@tanstack/react-router'
 
 import App from './App'

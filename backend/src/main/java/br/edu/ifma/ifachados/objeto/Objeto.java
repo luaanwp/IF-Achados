@@ -12,6 +12,8 @@ import jakarta.persistence.ManyToOne;
 
 import java.time.LocalDate;
 
+// Entidade principal do sistema: cada item perdido/achado cadastrado vira
+// uma linha na tabela "objeto" no MySQL, via JPA/Hibernate.
 @Entity
 public class Objeto {
 
@@ -34,10 +36,15 @@ public class Objeto {
     // "disponivel" ou "devolvido"
     private String status;
 
+    // Relacionamento N:1 — vários objetos podem ter a mesma categoria.
+    // @JoinColumn cria a coluna de chave estrangeira "categoria_id" na tabela objeto.
     @ManyToOne
     @JoinColumn(name = "categoria_id")
     private Categoria categoria;
 
+    // Relacionamento N:1 com User — vários objetos podem pertencer ao mesmo dono.
+    // Cria a coluna "dono_id". É esse vínculo que permite o endpoint
+    // GET /api/objetos/meus filtrar apenas os objetos de quem está logado.
     @ManyToOne
     @JoinColumn(name = "dono_id")
     private User dono;

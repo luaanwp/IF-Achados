@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { API_URL } from '../config/api'
 
-// Criamos o componente do Card igualzinho ao seu HTML
+// Componente local (só usado nesta página) que renderiza o card de um objeto
+// na grade da Home. Recebe o objeto inteiro via props e decide sozinho como
+// exibi-lo (cor da tag de categoria, texto de status etc.).
 function ItemCard({ objeto }) {
   
   const isDisponivel = objeto.status !== 'devolvido';
@@ -40,12 +42,16 @@ function ItemCard({ objeto }) {
   )
 }
 
+// Página inicial: mostra a busca rápida, os atalhos de categoria e uma
+// prévia dos objetos mais recentes (a lista completa fica em /objetos).
 function Home() {
   const [objetos, setObjetos] = useState([])
   const [carregando, setCarregando] = useState(true)
   const [busca, setBusca] = useState('')
   const navigate = useNavigate()
 
+  // useEffect com array de dependências vazio ([]) roda só uma vez,
+  // quando o componente monta — é aqui que buscamos os objetos no backend.
   useEffect(() => {
     fetch(`${API_URL}/api/objetos`)
       .then((response) => {
@@ -57,6 +63,9 @@ function Home() {
       .finally(() => setCarregando(false))
   }, [])
 
+  // A busca da Home não filtra nada localmente: ela só redireciona para
+  // /objetos passando o termo digitado como query param ("search"), e é a
+  // página ListaObjetos quem de fato faz a filtragem.
   function handleSearch(event) {
     event.preventDefault()
     navigate({

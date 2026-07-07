@@ -29,6 +29,10 @@ import br.edu.ifma.ifachados.objeto.dto.ObjetoDTO;
 import br.edu.ifma.ifachados.user.User;
 import br.edu.ifma.ifachados.user.UserRepository;
 
+// Controller REST com o CRUD de objetos perdidos/achados.
+// @CrossOrigin libera especificamente o frontend rodando em localhost:5173 a
+// chamar essa API — necessário porque front e back são aplicações separadas
+// rodando em portas diferentes (arquitetura desacoplada).
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/api/objetos")
@@ -138,7 +142,10 @@ public class ObjetoController {
         }
     }
 
-    // Atualizar objeto existente
+    // Atualizar objeto existente.
+    // Limitação conhecida: só atualiza nome/descrição/local/data — não trata troca
+    // de categoria nem de foto (precisaria virar @ModelAttribute + multipart, como
+    // o método criar(), se um dia for necessário editar esses dois campos também).
     @PutMapping("/{id}")
     public ResponseEntity<Objeto> atualizar(@PathVariable Long id, @RequestBody Objeto dadosAtualizados) {
         try {
