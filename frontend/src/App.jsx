@@ -7,6 +7,8 @@ function App() {
   const isAuthPage =
     currentPath === '/login' || currentPath === '/cadastro'
 
+  const emailLogado = localStorage.getItem('email')
+
   return (
     <>
       {!isAuthPage && (
@@ -40,12 +42,13 @@ function App() {
               Painel
             </Link>
 
-            <Link
-              to="/login"
-              className="btn-login-nav"
-            >
-              Login
-            </Link>
+            {emailLogado ? (
+              <span className="user-logado">{emailLogado}</span>
+            ) : (
+              <Link to="/login" className="btn-login-nav">
+                Login
+              </Link>
+            )}
           </nav>
         </header>
       )}

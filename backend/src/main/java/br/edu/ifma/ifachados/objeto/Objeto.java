@@ -1,6 +1,7 @@
 package br.edu.ifma.ifachados.objeto;
 
 import br.edu.ifma.ifachados.categoria.Categoria;
+import br.edu.ifma.ifachados.user.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -36,6 +37,10 @@ public class Objeto {
     @ManyToOne
     @JoinColumn(name = "categoria_id")
     private Categoria categoria;
+
+    @ManyToOne
+    @JoinColumn(name = "dono_id")
+    private User dono;
 
     public Objeto() {
     }
@@ -102,5 +107,13 @@ public class Objeto {
 
     public void setCategoria(Categoria categoria) {
         this.categoria = categoria;
+    }
+
+    public User getDono() {
+        return dono;
+    }
+
+    public void setDono(User dono) {
+        this.dono = dono;
     }
 }
