@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,6 +26,8 @@ import org.springframework.web.bind.annotation.RestController;
 import br.edu.ifma.ifachados.categoria.Categoria;
 import br.edu.ifma.ifachados.categoria.CategoriaRepository;
 import br.edu.ifma.ifachados.objeto.dto.ObjetoDTO;
+import br.edu.ifma.ifachados.user.User;
+import br.edu.ifma.ifachados.user.UserRepository;
 
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
@@ -37,7 +40,17 @@ public class ObjetoController {
     @Autowired
     private CategoriaRepository categoriaRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     private static final Logger logger = LoggerFactory.getLogger(ObjetoController.class);
+
+    // Pega o usuário logado a partir do e-mail salvo no contexto de segurança pelo JwtAuthFilter
+    private User getUsuarioLogado() {
+        String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuário logado não encontrado no banco: " + email));
+    }
 
     // Listar todos
     @GetMapping
@@ -84,6 +97,7 @@ public class ObjetoController {
             objeto.setData(LocalDate.parse(dto.getData()));
             objeto.setStatus("disponivel");
             objeto.setCategoria(categoria);
+            objeto.setDono(getUsuarioLogado());
 
             // Salva a foto, se o usuário enviou uma
             if (dto.getFoto() != null && !dto.getFoto().isEmpty()) {
@@ -93,7 +107,6 @@ public class ObjetoController {
                 }
 
                 String nomeOriginal = dto.getFoto().getOriginalFilename();
-                // Mesma sanitização que já usamos no upload do usuário
                 String nomeLimpo = nomeOriginal.replaceAll("[^a-zA-Z0-9.-]", "_");
                 String nomeArquivo = UUID.randomUUID() + "_" + nomeLimpo;
 
@@ -108,6 +121,19 @@ public class ObjetoController {
 
         } catch (IOException | IllegalStateException e) {
             logger.error("Erro ao criar objeto", e);
+            return ResponseEntity.status(500).body(null);
+        }
+    }
+
+    // Listar apenas os objetos do usuário logado
+    @GetMapping("/meus")
+    public ResponseEntity<List<Objeto>> listarMeus() {
+        try {
+            User usuario = getUsuarioLogado();
+            List<Objeto> meusObjetos = objetoRepository.findByDono(usuario);
+            return ResponseEntity.status(200).body(meusObjetos);
+        } catch (Exception e) {
+            logger.error("Erro ao listar objetos do usuário logado", e);
             return ResponseEntity.status(500).body(null);
         }
     }

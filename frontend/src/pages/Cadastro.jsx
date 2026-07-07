@@ -10,36 +10,35 @@ function Cadastro() {
   const [confirmarSenha, setConfirmarSenha] = useState('')
   const [carregando, setCarregando] = useState(false)
 
-  async function handleSubmit(event) {
-    event.preventDefault()
-    if (senha !== confirmarSenha) {
-      alert('As senhas introduzidas não coincidem.')
-      return
-    }
-
-    setCarregando(true)
-    try {
-      const response = await fetch(`${API_URL}/api/usuarios`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ nome, email, senha }),
-      })
-
-      if (!response.ok) {
-        throw new Error('Ocorreu um erro ao realizar o cadastro. Tente novamente.')
-      }
-
-      alert('Conta criada com sucesso! A redirecionar para a página de Login...')
-      navigate({ to: '/login' })
-    } catch (error) {
-      alert(error.message)
-    } finally {
-      setCarregando(false)
-    }
+async function handleSubmit(event) {
+  event.preventDefault()
+  if (senha !== confirmarSenha) {
+    alert('As senhas introduzidas não coincidem.')
+    return
   }
 
+  setCarregando(true)
+  try {
+    const response = await fetch(`${API_URL}/usuarios`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ nome, email, senha }),
+    })
+
+    if (!response.ok) {
+      throw new Error('Ocorreu um erro ao realizar o cadastro. Tente novamente.')
+    }
+
+    alert('Conta criada com sucesso! A redirecionar para a página de Login...')
+    navigate({ to: '/login' })
+  } catch (error) {
+    alert(error.message)
+  } finally {
+    setCarregando(false)
+  }
+}
 return (
   <div className="bg-split">
     <div className="auth-container">
@@ -133,6 +132,3 @@ return (
 }
 
 export default Cadastro
-a
-b
-c
