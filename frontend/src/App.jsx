@@ -42,6 +42,15 @@ function App() {
               Painel
             </Link>
 
+            {emailLogado && (
+              <Link
+                to="/perfil"
+                className={currentPath.startsWith('/perfil') ? 'active' : ''}
+              >
+                Perfil
+              </Link>
+            )}
+
             {emailLogado ? (
               <span className="user-logado">{emailLogado}</span>
             ) : (

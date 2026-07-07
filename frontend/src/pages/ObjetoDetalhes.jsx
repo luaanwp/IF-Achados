@@ -2,12 +2,29 @@ import { useEffect, useState } from 'react'
 import { Link, useParams, useNavigate } from '@tanstack/react-router'
 import { API_URL } from '../config/api'
 
+// Verifica se o token existe e ainda não expirou (mesma lógica das outras páginas)
+function tokenValido(token) {
+  if (!token) return false
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]))
+    const expiraEm = payload.exp * 1000
+    return Date.now() < expiraEm
+  } catch {
+    return false
+  }
+}
+
 function ObjetoDetalhes() {
   const { objetoId } = useParams({ strict: false })
   const navigate = useNavigate()
   const [objeto, setObjeto] = useState(null)
   const [carregando, setCarregando] = useState(true)
   const [erro, setErro] = useState(null)
+  const [atualizando, setAtualizando] = useState(false)
+
+  // Página é pública (qualquer visitante pode ver detalhes), mas o botão de
+  // "marcar como devolvido" só aparece se houver sessão válida
+  const logado = tokenValido(localStorage.getItem('token'))
 
   useEffect(() => {
     fetch(`${API_URL}/api/objetos/${objetoId}`)
@@ -24,11 +41,39 @@ function ObjetoDetalhes() {
   }, [objetoId]) 
 
 
-  // Função baseada no script.js novo (Marcar como devolvido)
-  const handleMarcarDevolvido = () => {
-    // Aqui você no futuro fará um PUT ou PATCH na API
-    alert("Status do objeto atualizado para 'Devolvido' com sucesso!");
-    navigate({ to: '/objetos' });
+  // Marcar como devolvido — integrado de verdade com PATCH /api/objetos/{id}/devolvido
+  async function handleMarcarDevolvido() {
+    const token = localStorage.getItem('token')
+    setAtualizando(true)
+
+    try {
+      const response = await fetch(`${API_URL}/api/objetos/${objetoId}/devolvido`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      })
+
+      if (response.status === 401 || response.status === 403) {
+        alert('Sua sessão expirou. Faça login novamente.')
+        localStorage.removeItem('token')
+        localStorage.removeItem('email')
+        navigate({ to: '/login' })
+        return
+      }
+
+      if (!response.ok) {
+        throw new Error('Não foi possível atualizar o status do objeto.')
+      }
+
+      alert("Status do objeto atualizado para 'Devolvido' com sucesso!")
+      navigate({ to: '/objetos' })
+    } catch (error) {
+      console.error('Erro ao marcar objeto como devolvido:', error)
+      alert(error.message || 'Erro ao conectar com o servidor.')
+    } finally {
+      setAtualizando(false)
+    }
   }
 
   if (carregando) return <main className="container"><p>Carregando detalhes do objeto...</p></main>
@@ -48,6 +93,9 @@ else if (categoriaNome === 'vestuario')
 const dataFormatada = objeto?.data
   ? new Date(objeto.data).toLocaleString('pt-BR')
   : ''
+
+  const isDisponivel = objeto.status !== 'devolvido'
+
   return (
     <main className="container">
       <div className="back-link-wrapper">
@@ -104,6 +152,18 @@ const dataFormatada = objeto?.data
           </div>
 
           <div className="details-actions">
+            {isDisponivel && logado && (
+              <button
+                type="button"
+                className="btn-salvar"
+                onClick={handleMarcarDevolvido}
+                disabled={atualizando}
+                style={{ marginRight: '0.6rem' }}
+              >
+                {atualizando ? 'Atualizando...' : 'Marcar como devolvido'}
+              </button>
+            )}
+
             <button
               type="button"
                 className="btn-secondary"

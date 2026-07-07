@@ -45,14 +45,38 @@ function Painel() {
       .finally(() => setCarregando(false))
   }, [autorizado])
 
-  // Função de Excluir (Simulada no Front por enquanto)
-  function handleDelete(id, nome) {
-    if (confirm(`Tem certeza que deseja excluir o objeto "${nome}"?`)) {
-      // TODO: integrar com DELETE {API_URL}/api/objetos/{id}
-      
-      // Remove da tela instantaneamente para o usuário ver acontecer
+  // Função de Excluir — agora integrada de verdade com DELETE /api/objetos/{id}
+  async function handleDelete(id, nome) {
+    if (!confirm(`Tem certeza que deseja excluir o objeto "${nome}"?`)) return
+
+    const token = localStorage.getItem('token')
+
+    try {
+      const response = await fetch(`${API_URL}/api/objetos/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      })
+
+      if (response.status === 401 || response.status === 403) {
+        alert('Sua sessão expirou. Faça login novamente.')
+        localStorage.removeItem('token')
+        localStorage.removeItem('email')
+        navigate({ to: '/login' })
+        return
+      }
+
+      if (!response.ok) {
+        throw new Error('Não foi possível excluir o objeto. Tente novamente.')
+      }
+
+      // Remove da tela só depois de confirmar que a exclusão deu certo no backend
       setObjetos(objetos.filter(obj => obj.id !== id))
       alert(`Objeto "${nome}" excluído com sucesso!`)
+    } catch (error) {
+      console.error('Erro ao excluir objeto:', error)
+      alert(error.message || 'Erro ao conectar com o servidor.')
     }
   }
 
@@ -73,7 +97,7 @@ function Painel() {
         </div>
 
         {carregando && <p style={{ textAlign: 'center', margin: '20px 0' }}>Carregando registros...</p>}
-        
+
         {!carregando && objetos.length === 0 && (
           <p style={{ textAlign: 'center', margin: '20px 0' }}>Nenhum objeto cadastrado no sistema.</p>
         )}
@@ -120,19 +144,19 @@ function Painel() {
                           <Link to={`/objetos/${objeto.id}`} className="btn-detalhes" style={{ padding: '4px 8px', fontSize: '0.9rem', textDecoration: 'none' }} title="Ver Detalhes">
                             <i className="fa-solid fa-eye"></i>
                           </Link>
-                          
-                          <button 
-                            className="btn-salvar" 
-                            style={{ padding: '4px 10px', fontSize: '0.9rem', background: '#e0a800', borderColor: '#e0a800' }} 
+
+                          <Link
+                            to={`/objetos/editar/${objeto.id}`}
+                            className="btn-salvar"
+                            style={{ padding: '4px 10px', fontSize: '0.9rem', background: '#e0a800', borderColor: '#e0a800', textDecoration: 'none' }}
                             title="Editar"
-                            onClick={() => alert(`Editar o objeto: "${objeto.nome}" (Funcionalidade de formulário em breve!)`)}
                           >
                             <i className="fa-solid fa-pen-to-square"></i>
-                          </button>
-                          
-                          <button 
-                            className="btn-cancelar" 
-                            style={{ padding: '4px 10px', fontSize: '0.9rem', margin: 0 }} 
+                          </Link>
+
+                          <button
+                            className="btn-cancelar"
+                            style={{ padding: '4px 10px', fontSize: '0.9rem', margin: 0 }}
                             title="Excluir"
                             onClick={() => handleDelete(objeto.id, objeto.nome)}
                           >

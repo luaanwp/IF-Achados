@@ -6,8 +6,10 @@ import Login from './pages/Login'
 import Cadastro from './pages/Cadastro'
 import ListaObjetos from './pages/ListaObjetos'
 import CadastroObjeto from './pages/CadastroObjeto'
+import EditarObjeto from './pages/EditarObjeto'
 import ObjetoDetalhes from './pages/ObjetoDetalhes'
 import Painel from './pages/Painel'
+import Perfil from './pages/Perfil'
 
 // Rota raiz: renderiza o layout (App.jsx), que tem o header/nav/footer
 // e o <Outlet /> onde as rotas filhas abaixo entram.
@@ -51,6 +53,18 @@ const painelRoute = createRoute({
   component: Painel,
 })
 
+const perfilRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/perfil',
+  component: Perfil,
+})
+
+const editarObjetoRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/objetos/editar/$objetoId',
+  component: EditarObjeto,
+})
+
 const objetoDetalhesRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/objetos/$objetoId',
@@ -63,8 +77,10 @@ const routeTree = rootRoute.addChildren([
   cadastroRoute,
   objetosRoute,
   novoObjetoRoute,
+  editarObjetoRoute,
   objetoDetalhesRoute,
   painelRoute,
+  perfilRoute,
 ])
 
 export const router = createRouter({ routeTree })
