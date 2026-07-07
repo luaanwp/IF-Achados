@@ -122,7 +122,7 @@ function ListaObjetos() {
         </p>
       )}
 
-      <section className="objects-grid">
+      <section className="grid-objetos">
         {objetosFiltrados.map((objeto) => (
           <ItemCard key={objeto.id} objeto={objeto} />
         ))}
