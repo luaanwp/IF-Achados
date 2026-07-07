@@ -38,7 +38,19 @@ function ListaObjetos() {
   const [erro, setErro] = useState(null)
 
   const search = useSearch({ strict: false })
-  const categoriaSelecionada = search.categoria || ''
+
+  // Estado dos filtros — inicializado a partir da URL (ex: vindo dos cards de
+  // categoria da Home, que já mandam ?categoria=documentos, ou da busca do hero)
+  const [busca, setBusca] = useState(search.busca || '')
+  const [categoria, setCategoria] = useState(search.categoria || '')
+  const [status, setStatus] = useState('')
+
+  // Se a pessoa navegar de novo pra essa página com outro filtro na URL
+  // (ex: clicou em outro card de categoria na Home), sincroniza os campos
+  useEffect(() => {
+    setBusca(search.busca || '')
+    setCategoria(search.categoria || '')
+  }, [search.busca, search.categoria])
 
   useEffect(() => {
     fetch(`${API_URL}/api/objetos`)
@@ -51,16 +63,37 @@ function ListaObjetos() {
       .finally(() => setCarregando(false))
   }, [])
 
+  // Filtro aplicado sobre a lista já carregada — busca por nome (parcial,
+  // sem diferenciar maiúsculas/minúsculas) + categoria exata + status exato
+  const objetosFiltrados = objetos.filter((objeto) => {
+    const nomeCategoria = objeto.categoria?.nome?.toLowerCase() || ''
+
+    if (categoria && nomeCategoria !== categoria) return false
+    if (status && objeto.status !== status) return false
+    if (busca && !objeto.nome.toLowerCase().includes(busca.toLowerCase())) return false
+
+    return true
+  })
+
   return (
     <main className="container">
       <section className="filter-wrapper">
         <form className="search-bar inline" onSubmit={(e) => e.preventDefault()}>
-          <input type="text" placeholder="Buscar objeto..." />
+          <input
+            type="text"
+            placeholder="Buscar objeto..."
+            value={busca}
+            onChange={(e) => setBusca(e.target.value)}
+          />
           <button type="submit"><i className="fa-solid fa-magnifying-glass"></i></button>
         </form>
-        
+
         <div className="select-filters">
-          <select id="filtro-categoria" value={categoriaSelecionada}>
+          <select
+            id="filtro-categoria"
+            value={categoria}
+            onChange={(e) => setCategoria(e.target.value)}
+          >
             <option value="">Categoria: Todas</option>
             <option value="documentos">Documentos</option>
             <option value="eletronicos">Eletrônicos</option>
@@ -68,8 +101,12 @@ function ListaObjetos() {
             <option value="vestuario">Vestuário</option>
             <option value="outros">Outros</option>
           </select>
-          
-          <select id="filtro-status" defaultValue="">
+
+          <select
+            id="filtro-status"
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+          >
             <option value="">Status: Todos</option>
             <option value="disponivel">Disponível</option>
             <option value="devolvido">Devolvido</option>
@@ -79,17 +116,19 @@ function ListaObjetos() {
 
       {carregando && <p style={{textAlign: 'center', marginTop: '20px'}}>Carregando...</p>}
       {erro && <p role="alert" style={{color: 'red', textAlign: 'center', marginTop: '20px'}}>Não foi possível carregar os itens agora.</p>}
-      {!carregando && !erro && objetos.length === 0 && (
-        <p style={{textAlign: 'center', marginTop: '20px'}}>Nenhum objeto cadastrado ainda.</p>
+      {!carregando && !erro && objetosFiltrados.length === 0 && (
+        <p style={{textAlign: 'center', marginTop: '20px'}}>
+          {objetos.length === 0 ? 'Nenhum objeto cadastrado ainda.' : 'Nenhum objeto encontrado com esses filtros.'}
+        </p>
       )}
 
       <section className="objects-grid">
-        {objetos.map((objeto) => (
+        {objetosFiltrados.map((objeto) => (
           <ItemCard key={objeto.id} objeto={objeto} />
         ))}
       </section>
 
-      {objetos.length > 0 && (
+      {objetosFiltrados.length > 0 && (
         <div className="pagination">
           <button className="btn-pag page-control"><i className="fa-solid fa-chevron-left"></i></button>
           <button className="btn-pag active">1</button>
