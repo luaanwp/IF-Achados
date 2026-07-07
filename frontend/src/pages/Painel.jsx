@@ -1,12 +1,40 @@
 import { useEffect, useState } from 'react'
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { API_URL } from '../config/api'
+
+// Verifica se o token existe e ainda não expirou
+function tokenValido(token) {
+  if (!token) return false
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]))
+    const expiraEm = payload.exp * 1000 // exp vem em segundos, Date usa milissegundos
+    return Date.now() < expiraEm
+  } catch {
+    return false
+  }
+}
 
 function Painel() {
   const [objetos, setObjetos] = useState([])
   const [carregando, setCarregando] = useState(true)
+  const [autorizado, setAutorizado] = useState(false)
+  const navigate = useNavigate()
+
+  // Proteção de rota: só libera o conteúdo se o token existir e for válido
+  useEffect(() => {
+    const token = localStorage.getItem('token')
+    if (!tokenValido(token)) {
+      localStorage.removeItem('token')
+      localStorage.removeItem('email')
+      navigate({ to: '/login' })
+      return
+    }
+    setAutorizado(true)
+  }, [])
 
   useEffect(() => {
+    if (!autorizado) return
+
     fetch(`${API_URL}/api/objetos`)
       .then((response) => {
         if (!response.ok) throw new Error('Falha ao buscar objetos')
@@ -15,7 +43,7 @@ function Painel() {
       .then((dados) => setObjetos(dados))
       .catch(() => setObjetos([]))
       .finally(() => setCarregando(false))
-  }, [])
+  }, [autorizado])
 
   // Função de Excluir (Simulada no Front por enquanto)
   function handleDelete(id, nome) {
@@ -27,6 +55,9 @@ function Painel() {
       alert(`Objeto "${nome}" excluído com sucesso!`)
     }
   }
+
+  // Enquanto verifica o token, não renderiza nada (evita "piscar" a tela protegida)
+  if (!autorizado) return null
 
   return (
     <main className="container">

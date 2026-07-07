@@ -10,9 +10,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
 @Configuration
 public class SecurityConfig {
 
+    
     @Autowired
     private JwtAuthFilter jwtAuthFilter;
 
@@ -27,9 +29,15 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
+                // Libera o preflight (OPTIONS) do navegador para qualquer rota — precisa vir primeiro
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
                 .requestMatchers("/auth/**").permitAll()
                 .requestMatchers("/usuarios").permitAll()
                 .requestMatchers("/usuarios/upload").permitAll()
+
+                // Arquivos de imagem enviados (uploads de usuário e de objetos) são públicos
+                .requestMatchers(HttpMethod.GET, "/uploads/**").permitAll()
 
                 // Consulta pública
                 .requestMatchers(HttpMethod.GET, "/api/objetos", "/api/objetos/**").permitAll()

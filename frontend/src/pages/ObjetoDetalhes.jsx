@@ -59,7 +59,15 @@ const dataFormatada = objeto?.data
       <section className="details-card">
         <div className="details-image-side">
           <div className="img-large-placeholder">
-            <i className="fa-regular fa-image"></i>
+            {objeto.fotoUrl ? (
+              <img
+                src={objeto.fotoUrl}
+                alt={objeto.nome}
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              />
+            ) : (
+              <i className="fa-regular fa-image"></i>
+            )}
           </div>
         </div>
         <div className="details-info-side">

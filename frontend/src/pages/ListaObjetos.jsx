@@ -8,7 +8,17 @@ function ItemCard({ objeto }) {
 
   return (
     <div className="obj-card">
-      <div className="img-placeholder"><i className="fa-regular fa-image"></i></div>
+      <div className="img-placeholder">
+        {objeto.fotoUrl ? (
+          <img
+            src={objeto.fotoUrl}
+            alt={objeto.nome}
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
+        ) : (
+          <i className="fa-regular fa-image"></i>
+        )}
+      </div>
       <div className="obj-info">
         <h4>{objeto.nome}</h4>
         <span className="tag cat-outros">{objeto.categoria.nome}</span>

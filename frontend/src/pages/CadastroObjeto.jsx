@@ -1,61 +1,121 @@
-import { useState, useRef, useEffect, use } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useNavigate, Link } from '@tanstack/react-router'
 import { API_URL } from '../config/api'
 
+// Verifica se o token existe e ainda não expirou
+function tokenValido(token) {
+  if (!token) return false
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]))
+    const expiraEm = payload.exp * 1000
+    return Date.now() < expiraEm
+  } catch {
+    return false
+  }
+}
+
 function CadastroObjeto() {
   const navigate = useNavigate()
+  const [autorizado, setAutorizado] = useState(false)
   const [nome, setNome] = useState('')
   const [categoria, setCategoria] = useState('')
   const [local, setLocal] = useState('')
   const [data, setData] = useState('')
   const [foto, setFoto] = useState(null)
   const [descricao, setDescricao] = useState("");
+  const [enviando, setEnviando] = useState(false)
+  const [erro, setErro] = useState('')
 
-  // Referência para o textarea, usada para ajustar a altura automaticamente
+  useEffect(() => {
+    const token = localStorage.getItem('token')
+    if (!tokenValido(token)) {
+      localStorage.removeItem('token')
+      localStorage.removeItem('email')
+      navigate({ to: '/login' })
+      return
+    }
+    setAutorizado(true)
+  }, [])
+
   const descricaoRef = useRef(null)
-const handleDescricao = (e) => {
-  const value = e.target.value;
+  const handleDescricao = (e) => {
+    const value = e.target.value;
+    if (value.length <= 600) {
+      setDescricao(value);
+    }
+  };
 
-  if (value.length <= 600) {
-    setDescricao(value);
-  }
-};
-
-  // Ajusta a altura do textarea sempre que o texto mudar
   useEffect(() => {
     const el = descricaoRef.current
     if (el) {
-      el.style.height = 'auto' // reseta para recalcular corretamente ao apagar texto
+      el.style.height = 'auto'
       el.style.height = `${el.scrollHeight}px`
     }
   }, [descricao])
 
-  // Referência para o input de arquivo oculto
   const fileInputRef = useRef(null)
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault()
-    // TODO: integrar com POST {API_URL}/api/objetos
-    console.log('novo objeto', { nome, categoria, descricao, local, data, foto, API_URL })
-    
-    // Simula o salvamento e volta para a tela de listagem (ou painel)
-    alert("Objeto cadastrado com sucesso!")
-    navigate({ to: '/objetos' })
+    setErro('')
+    setEnviando(true)
+
+    const token = localStorage.getItem('token')
+
+    const formData = new FormData()
+    formData.append('nome', nome)
+    formData.append('categoria', categoria)
+    formData.append('descricao', descricao)
+    formData.append('local', local)
+    formData.append('data', data)
+    if (foto) {
+      formData.append('foto', foto)
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/api/objetos`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        body: formData,
+      })
+
+      if (response.status === 401 || response.status === 403) {
+        setErro('Sua sessão expirou. Faça login novamente.')
+        localStorage.removeItem('token')
+        localStorage.removeItem('email')
+        navigate({ to: '/login' })
+        return
+      }
+
+      if (!response.ok) {
+        throw new Error('Não foi possível cadastrar o objeto. Tente novamente.')
+      }
+
+      alert("Objeto cadastrado com sucesso!")
+      navigate({ to: '/objetos' })
+    } catch (err) {
+      console.error('Erro ao cadastrar objeto:', err)
+      setErro(err.message || 'Erro ao conectar com o servidor.')
+    } finally {
+      setEnviando(false)
+    }
   }
 
-  // Função para simular o clique no input file quando clicar na zona de upload
   function handleUploadClick() {
     if (fileInputRef.current) {
       fileInputRef.current.click()
     }
   }
 
-  // Função para guardar o arquivo selecionado no estado do React
   function handleFileChange(event) {
     if (event.target.files && event.target.files.length > 0) {
       setFoto(event.target.files[0])
     }
   }
+
+  if (!autorizado) return null
 
   return (
     <main className="container page-flex-center">
@@ -101,12 +161,11 @@ const handleDescricao = (e) => {
               rows="4" 
               placeholder="Descreva o objeto encontrado... " 
               value={descricao}
-              onChange= {handleDescricao}
-              
+              onChange={handleDescricao}
             ></textarea>
             <div className="char-counter">
               {descricao.length}/600
-          </div>
+            </div>
           </div>
 
           <div className="form-row-2">
@@ -123,7 +182,6 @@ const handleDescricao = (e) => {
             </div>
             <div className="form-group">
               <label htmlFor="data-obj">Data encontrada</label>
-              {/* Mudei o type para "date" para facilitar a seleção no navegador */}
               <input 
                 type="date" 
                 id="data-obj" 
@@ -138,7 +196,6 @@ const handleDescricao = (e) => {
             <label>Foto do objeto</label>
             <div className="upload-zone" id="uploadZone" onClick={handleUploadClick} style={{ cursor: 'pointer' }}>
               <i className="fa-solid fa-cloud-arrow-up"></i>
-              {/* O texto muda dinamicamente se o usuário selecionar uma foto */}
               <p>{foto ? `Arquivo: ${foto.name}` : 'Clique para selecionar uma imagem ou arraste e solte aqui'}</p>
               <input 
                 type="file" 
@@ -151,10 +208,13 @@ const handleDescricao = (e) => {
             </div>
           </div>
 
+          {erro && <p style={{ color: 'red', fontSize: '0.9rem' }}>{erro}</p>}
+
           <div className="form-actions-row">
-            {/* O Link do React Router substitui a tag <a> padrão do HTML para não recarregar a página */}
             <Link to="/objetos" className="btn-cancelar">Cancelar</Link>
-            <button type="submit" className="btn-salvar">Salvar</button>
+            <button type="submit" className="btn-salvar" disabled={enviando}>
+              {enviando ? 'Salvando...' : 'Salvar'}
+            </button>
           </div>
         </form>
       </div>
