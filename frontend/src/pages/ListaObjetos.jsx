@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link } from '@tanstack/react-router'
+import { Link, useSearch } from '@tanstack/react-router'
 import { API_URL } from '../config/api'
 
 // O componente de Card que ficava separado ou dentro do arquivo
@@ -37,6 +37,9 @@ function ListaObjetos() {
   const [carregando, setCarregando] = useState(true)
   const [erro, setErro] = useState(null)
 
+  const search = useSearch({ strict: false })
+  const categoriaSelecionada = search.categoria || ''
+
   useEffect(() => {
     fetch(`${API_URL}/api/objetos`)
       .then((response) => {
@@ -57,7 +60,7 @@ function ListaObjetos() {
         </form>
         
         <div className="select-filters">
-          <select id="filtro-categoria" defaultValue="">
+          <select id="filtro-categoria" value={categoriaSelecionada}>
             <option value="">Categoria: Todas</option>
             <option value="documentos">Documentos</option>
             <option value="eletronicos">Eletrônicos</option>
