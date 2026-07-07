@@ -33,7 +33,7 @@ Acesse a pasta `backend/` e execute o projeto Spring Boot com o Maven Wrapper qu
 
 Frontend
 
-Acesse a pasta `frontend/` e utilize os scripts definidos em `package.json`.
+Acesse a pasta `frontend/` e utilize os scripts definidos em `package.json`. cd frontend depois npm run dev
 
 ## Segurança
 
