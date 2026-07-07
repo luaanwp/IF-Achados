@@ -133,3 +133,6 @@ return (
 }
 
 export default Cadastro
+a
+b
+c
